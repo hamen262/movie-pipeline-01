@@ -1,64 +1,62 @@
-name: CI Frontend
+name: CI-Frontend-Workflow
 
+# The workflow will be triggered by push to the 'main' branch and manual trigger
 on:
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'starter/frontend/**'
+  workflow_dispatch:  # allows manual triggers
+  schedule:
+    - cron: '0 0 * * 0'  # Run every Sunday at 00:00 UTC
   push:
     branches:
-      - main
-    paths:
-      - 'starter/frontend/**'
-  workflow_dispatch: # Cho phép chạy workflow này thủ công
+      - main  # Trigger on push to the 'main' branch
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-
-      - name: Install dependencies
-        working-directory: ./starter/frontend
-        run: npm install
-
-      - name: Run eslint
-        working-directory: ./starter/frontend
-        run: npm run lint
-
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-
-      - name: Install dependencies
-        working-directory: ./starter/frontend
-        run: npm install
-
-      - name: Run tests
-        working-directory: ./starter/frontend
-        run: npm run test
-
   build:
-    runs-on: ubuntu-latest
-    needs: [lint, test]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    runs-on: ubuntu-latest  # Set the runner to Ubuntu latest version
 
-      - name: Build Docker image for frontend
-        working-directory: ./starter/frontend
-        run: docker build -t frontend:latest .
+    steps:
+      # Step 1: Checkout the code from the repository
+      - uses: actions/checkout@v3
+
+      # Step 2: Set up Node.js using a specified version (you can specify the version needed for your project)
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'  # Specify the Node.js version to use
+
+      # Step 3: Cache node_modules to speed up subsequent builds
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      # Step 4: Install the frontend dependencies
+      - run: npm ci
+        working-directory: starter/frontend
+        name: Install Frontend Dependencies
+
+      # Step 5: Lint the frontend code
+      - run: npm run lint
+        working-directory: starter/frontend
+        name: Lint Frontend Code
+
+      # Step 6: Run the frontend tests
+      - run: npm test -- --coverage
+        working-directory: starter/frontend
+        name: Run Frontend Tests
+
+      # Step 7: Build the frontend application
+      - run: npm run build
+        working-directory: starter/frontend
+        name: Build Frontend Application
+
+      # Step 8: Serve the built application (optional)
+      - run: npm run serve
+        working-directory: starter/frontend
+        name: Serve Frontend Application
+
+      # Step 9: Completion message
+      - run: |
+          echo "Hello ${{ github.actor }}. You pushed to ${{ github.repository }} at $(date)."
+        name: Completion Message
