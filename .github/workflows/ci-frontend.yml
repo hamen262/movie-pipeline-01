@@ -26,14 +26,12 @@ jobs:
           node-version: '14'
 
       - name: Install dependencies
-        run: |
-          cd starter/frontend
-          npm install
+        working-directory: ./starter/frontend
+        run: npm install
 
       - name: Run eslint
-        run: |
-          cd starter/frontend
-          npm run lint
+        working-directory: ./starter/frontend
+        run: npm run lint
 
   test:
     runs-on: ubuntu-latest
@@ -47,14 +45,12 @@ jobs:
           node-version: '14'
 
       - name: Install dependencies
-        run: |
-          cd starter/frontend
-          npm install
+        working-directory: ./starter/frontend
+        run: npm install
 
       - name: Run tests
-        run: |
-          cd starter/frontend
-          npm run test
+        working-directory: ./starter/frontend
+        run: npm run test
 
   build:
     runs-on: ubuntu-latest
@@ -64,6 +60,5 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Build Docker image for frontend
-        run: |
-          cd starter/frontend
-          docker build -t frontend:latest .
+        working-directory: ./starter/frontend
+        run: docker build -t frontend:latest .
