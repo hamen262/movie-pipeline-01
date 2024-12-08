@@ -1,12 +1,17 @@
-name: Frontend CI
+name: CI Frontend
 
 on:
   pull_request:
     branches:
       - main
     paths:
-      - 'frontend/**'
-  workflow_dispatch:
+      - 'starter/frontend/**'
+  push:
+    branches:
+      - main
+    paths:
+      - 'starter/frontend/**'
+  workflow_dispatch: # Cho phép chạy workflow này thủ công
 
 jobs:
   lint:
@@ -22,12 +27,12 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd frontend
+          cd starter/frontend
           npm install
 
       - name: Run eslint
         run: |
-          cd frontend
+          cd starter/frontend
           npm run lint
 
   test:
@@ -43,12 +48,12 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd frontend
+          cd starter/frontend
           npm install
 
       - name: Run tests
         run: |
-          cd frontend
+          cd starter/frontend
           npm run test
 
   build:
@@ -60,5 +65,5 @@ jobs:
 
       - name: Build Docker image for frontend
         run: |
-          cd frontend
+          cd starter/frontend
           docker build -t frontend:latest .
