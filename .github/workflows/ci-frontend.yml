@@ -33,7 +33,7 @@ jobs:
 
       # Step 4: Install the frontend dependencies
       - run: npm ci
-        working-directory: starter/frontend
+        working-directory: ../starter/frontend
         name: Install Frontend Dependencies
 
       # Step 5: Lint the frontend code
